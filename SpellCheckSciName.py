@@ -1,6 +1,6 @@
 """
 
-A script to spell check scientific names in entries against placename entry titles
+A script to spell check scientific names in entries against placename italic phrases
 
 
 Author: Lucinda Royte
@@ -50,12 +50,10 @@ def write_italic_phrases_to_csv(italic_phrases_filename, csv_file):
             writer.writerow(row)
 
     return csv_file
-# Example usage
 italic_phrases_csv_maker = write_italic_phrases_to_csv(italic_phrases_filename, '/Users/lucindaroyte/Documents/Work/Welikia_Script/SpellCheckSciName/italic_phrases.csv')
 
 
 
-import csv
 
 def check_italic_phrases(italic_phrases_csv, sci_names_csv):
     sci_names = {}
