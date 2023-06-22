@@ -40,24 +40,28 @@ class Reference:
         FROM placename
         LEFT JOIN placename_altname p2 ON (placename.id_placename = p2.id_pn_a)
         INNER JOIN sdr ON (p2.id_sdr = sdr.id)
+        WHERE p2.output_use=1
 
         UNION 
         SELECT placename.id_placename, sdr.name_shorter, NULLIF(p2.pagenumbers, '') AS pagenumbers, id_sdrtype
         FROM placename
         LEFT JOIN placename_location p2 ON (placename.id_placename = p2.id_placename)
         INNER JOIN sdr ON (p2.id_sdr = sdr.id)
+        WHERE p2.output_use = 1
 
         UNION 
         SELECT placename.id_placename, sdr.name_shorter, NULLIF(p2.pagenumbers, '') AS pagenumbers, id_sdrtype
         FROM placename
         LEFT JOIN placename_description p2 ON (placename.id_placename = p2.id_placename)
         INNER JOIN sdr ON (p2.id_sdr = sdr.id)
+        WHERE p2.output_use = 1
 
         UNION 
         SELECT placename.id_placename, sdr.name_shorter, NULLIF(p2.pagenumbers, '') AS pagenumbers, id_sdrtype
         FROM placename
         LEFT JOIN placename_laterdev p2 ON (placename.id_placename = p2.id_placename)
         INNER JOIN sdr ON (p2.id_sdr = sdr.id)
+        WHERE p2.output_use = 1
     ) AS ref
     -- no duplicate SDRs per placename (UNION removes duplicates but evaluating using all fields)
     GROUP BY id_placename, name_shorter
