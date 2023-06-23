@@ -28,21 +28,19 @@ def create_md_files(doc_file):
         placename_id = helpers.get_placename_id(doc_file, end_index)
 
         # Create the filename for the new Markdown file
-        filename = output  + placename + "." + placename_id + "." + "4.md"
+        filename = os.path.join(output, placename + "." + placename_id + "." + "5.md")
 
         # Get the entry text between <start_text> and <end_text>
         entry_text = helpers.get_entry_text(doc_file, start_index, end_index)
 
         # Create the new Markdown file with the entry text and filename
-        with open(filename, "w") as f:
-            f.write("# " + placename + "\n\n" + entry_text)
+        with open(filename, "w", encoding='utf-8') as f:
+            f.write(entry_text)
         counter += 1
         #set number of entries you want to grab
-        if counter == 10:
-            break
     return 
 
-word_document = r'C:\Users\lroyte\Documents\Welikia\scripts\word_split_md/bronx-gazetteer-entries_2022-11-02_EH_edit.docx'
-output = r'C:\Users\lroyte\Documents\Welikia\scripts\word_split_md\output/'
+word_document = r'C:\Users\lroyte\Documents\Bucket_Connect_Welikia\book\a Welikia Atlas\3 - gazetteer\Eric Himmel edits\bronx-gazetteer-entries_2022-11-02_EH edit-ews Changes Accepted.docx'
+output = r'C:\Users\lroyte\Documents\Bucket_Connect_Welikia\book\a Welikia Atlas\3 - gazetteer\fifth draft entries\bronx\\'
 
 create_md_files(word_document)
