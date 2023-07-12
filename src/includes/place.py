@@ -23,11 +23,12 @@ class Reference:
         # de-duplicate and sort pagenumbers from multiple uses of SDR per placename
         # TODO: fancier aggregation attempt, to handle things like "107, 107-108, ..."
         if self.pagenumbers:
-            pns = self.pagenumbers.split(",")
-            pns_deduped = set([e.strip() for e in pns])
-            # TODO: numeric sort? String may not have numeric page numbers
-            pns_sorted = sorted(pns_deduped)
-            self.pagenumbers = ", ".join(pns_sorted)
+            pns = self.pagenumbers
+            # pns_deduped = set([e.strip() for e in pns])
+            # print(pns_deduped)
+            # # TODO: numeric sort? String may not have numeric page numbers
+            # pns_sorted = sorted(pns_deduped)
+            self.pagenumbers = pns
 
     sql = """
     SELECT 
@@ -88,7 +89,7 @@ class Place:
         name = self.name
         # Comment these two lines if special invented treatment not desired
         if self.name_invented is True:
-            name = f"[{self.name}]"
+            name = f"{self.name}"
         if self.name_indigenous is True:
             name = f'"{name}"'
         return name

@@ -6,11 +6,12 @@ class Database:
         # TODO: handle port forwarding
         #  https://medium.com/@amirziai/query-your-database-over-an-ssh-tunnel-with-pandas-603ce49b35a1
         #  https://stackoverflow.com/questions/12989866/python-ssh-tunnel-setup-and-mysql-db-access
-        self.dbhost = config.get("DBHOST")
-        self.dbport = config.get("DBPORT")
-        self.dbname = config.get("DBNAME")
-        self.dbuser = config.get("DBUSER")
-        self.dbpass = config.get("DBPASS")
+        self.dbhost = config["DBHOST"]
+        self.dbport = config["DBPORT"]
+        self.dbname = config["DBNAME"]
+        self.dbuser = config["DBUSER"]
+        self.dbpass = config["DBPASS"]
+
         if (
             not self.dbhost
             or not self.dbport
