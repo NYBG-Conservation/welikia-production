@@ -18,10 +18,11 @@ import mysql.connector
 from dotenv import load_dotenv
 import os
 from pathlib import Path
+import re
 
 # 1. SETUP
 
-VERSION = 3  # markdown file draft
+VERSION = 3 # markdown file draft
 ID_LENAPE = 3
 # ("1"=>"extant", "2"=>"disappeared", "3"=>"created", "4"=>"post-1609 natural")
 STATUS_LABELS = {1: "", 2: "†", 3: "‡", 4: "≈"}
@@ -86,8 +87,10 @@ options = vars(parser.parse_args())
 shapefile = Path(options.get("shapefile")).expanduser()
 markdown_dir = Path(options.get("markdown-dir")).expanduser()
 timestr = datetime.now().date().isoformat()
+markdown_dir_name = markdown_dir.name
+
 outputfile = Path(
-    options.get("output") or f"{markdown_dir.parent}/gazetteer-entries_{timestr}.md"
+    options.get("output") or f"{markdown_dir.parent}/{markdown_dir_name}_{timestr}.md"
 )
 
 
@@ -97,15 +100,12 @@ def get_study_areas(areas):
 
 # 2. INITIAL POPULATION FROM DATABASE
 
-import re
-
-import re
-
 places = []
 with Database(config) as db:
     references = [Reference(*row) for row in db.query(Reference.sql)]
     maps = [r for r in references if r.type == "map"]
     texts = [r for r in references if r.type == "text"]
+    artwork = [r for r in references if r.type == "artwork"]
     place_results = db.query(Place.sql)
     for placerow in place_results:
         place = Place(
@@ -118,6 +118,7 @@ with Database(config) as db:
             study_areas=get_study_areas(placerow[-11:]),
             maps=[m for m in maps if m.id_placename == placerow[0]],
             texts=[t for t in texts if t.id_placename == placerow[0]],
+            artwork=[a for a in artwork if a.id_placename == placerow[0]]
         )
         places.append(place)
 
@@ -149,7 +150,7 @@ for mdfile in mdfiles:
 
 #place_csv = r"C:\_data\book\a Welikia Atlas\3 - gazetteer\plate_grid_ids\placename_grid_v7_07052022.csv"
 #place_csv = r"C:\_data\book\a Welikia Atlas\3 - gazetteer\plate_grid_ids\placename_grid_v7_08142022.csv"
-place_csv = r"C:\Users\lroyte\Documents\Bucket_Connect_Welikia\book\a Welikia Atlas\3 - gazetteer\placename_v7.1_grid_08142022.csv"
+place_csv = r"C:\Users\lroyte\Documents\Bucket_Connect_Welikia\book\a Welikia Atlas\3 - gazetteer\plate_grid\placename_v7.3_grid_05242024.csv"
 
 with open (place_csv) as csv_file:
     csv_reader  = csv.reader(csv_file, delimiter = ',')
@@ -177,7 +178,7 @@ with open (place_csv) as csv_file:
 # sort by name
 places.sort(key=attrgetter("name"))
 # filter by borough
-# brooklyn_places = [p for p in places if "Brooklyn" in p.study_areas]
+brooklyn_places = [p for p in places if "Brooklyn" in p.study_areas]
 # bronx_places = [p for p in places if "Bronx" in p.study_areas]
 places = [p for p in places if p.main_text != ""]   # removes all places without markdown text entry
 # print(bronx_places[0])

@@ -1,12 +1,14 @@
 from dataclasses import dataclass
 from typing import List
 from .utils import format_references
+import re
 
 
 @dataclass
 class Reference:
     MAP_TYPES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 23, 24]
     TEXT_TYPES = [14, 15, 16, 17, 18]
+    ART_TYPES = [19, 20, 21]
 
     id_placename: int
     name_shorter: str
@@ -17,6 +19,8 @@ class Reference:
     def __post_init__(self):
         if self.id_sdrtype in self.MAP_TYPES:
             self.type = "map"
+        elif self.id_sdrtype in self.ART_TYPES:
+            self.type = "artwork"
         elif self.id_sdrtype in self.TEXT_TYPES:
             self.type = "text"
 
@@ -77,6 +81,7 @@ class Place:
     study_areas: list
     maps: List[Reference]
     texts: List[Reference]
+    artwork: List[Reference]
     main_text: str = ""
     plate: int = None
     grid: str = ""
@@ -86,22 +91,24 @@ class Place:
 
     @property
     def output_name(self):
-        name = self.name
+        cleaned_name = re.sub(r'\[.*?\]', '', self.name)
+
         # Comment these two lines if special invented treatment not desired
-        if self.name_invented is True:
-            name = f"{self.name}"
-        if self.name_indigenous is True:
-            name = f'"{name}"'
-        return name
+        # if self.name_invented is True:
+        #     cleaned_name = f"{self.name}"
+        # if self.name_indigenous is True:
+        #     cleaned_name = f'"{cleaned_name}"'
+        return cleaned_name.strip()
 
     @property
     def references_output(self):
-        if len(self.maps + self.texts) <= 5:
-            return format_references("Reference", self.maps + self.texts)
+        if len(self.maps + self.texts + self.artwork) <= 5:
+            return format_references("Reference", self.maps + self.texts + self.artwork)
         else:
             maps = format_references("Map", self.maps)
             texts = format_references("Text", self.texts)
-            return f"{maps}{texts}"
+            artwork = format_references("Artwork", self.artwork)
+        return f"{maps}{texts}{artwork}"
 
     sql = """
 SELECT placename.id_placename,

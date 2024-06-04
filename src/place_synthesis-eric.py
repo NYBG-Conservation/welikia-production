@@ -14,7 +14,10 @@ from includes.utils import (
     truthy,
     update_places,
 )
-
+import mysql.connector
+from dotenv import load_dotenv
+import os
+from pathlib import Path
 
 # 1. SETUP
 
@@ -36,8 +39,33 @@ STUDY_AREAS = [
     ("sa_westchester", "Westchester"),
 ]
 
-envfile = "{}/.env".format(Path(__file__).parents[1].as_posix())
-config = dotenv_values(dotenv_path=envfile, verbose=True)
+envfile = Path(__file__).resolve().parents[1] / 'lucy.env'
+print(envfile)
+load_dotenv(dotenv_path=envfile)
+
+# Retrieve the database configuration parameters from environment variables
+config = {
+    "DBHOST": os.getenv("DBHOST"),
+    "DBPORT": os.getenv("DBPORT"),
+    "DBNAME": os.getenv("DBNAME"),
+    "DBUSER": os.getenv("DBUSER"),
+    "DBPASS": os.getenv("DBPASS"),
+}
+
+# Retrieve the values from the config dictionary
+dbhost = config["DBHOST"]
+dbport = config["DBPORT"]
+dbname = config["DBNAME"]
+dbuser = config["DBUSER"]
+dbpass = config["DBPASS"]
+
+# Print the retrieved values to debug
+print("DBHOST:", dbhost)
+print("DBPORT:", dbport)
+print("DBNAME:", dbname)
+print("DBUSER:", dbuser)
+print("DBPASS:", dbpass)
+
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument(
@@ -69,12 +97,15 @@ def get_study_areas(areas):
 
 # 2. INITIAL POPULATION FROM DATABASE
 
+import re
+
+import re
+
 places = []
 with Database(config) as db:
     references = [Reference(*row) for row in db.query(Reference.sql)]
     maps = [r for r in references if r.type == "map"]
     texts = [r for r in references if r.type == "text"]
-
     place_results = db.query(Place.sql)
     for placerow in place_results:
         place = Place(
@@ -83,13 +114,16 @@ with Database(config) as db:
             name_invented=truthy(placerow[2]),
             name_indigenous=(placerow[3] == ID_LENAPE),
             status=STATUS_LABELS.get(placerow[4], ""),
-            description=placerow[5] or "",  # db (not markdown) description
+            description=placerow[5] or "",
             study_areas=get_study_areas(placerow[-11:]),
             maps=[m for m in maps if m.id_placename == placerow[0]],
             texts=[t for t in texts if t.id_placename == placerow[0]],
         )
-        
         places.append(place)
+
+
+
+
 
 
 
@@ -107,7 +141,6 @@ for mdfile in mdfiles:
             print (mdfile)
     places = update_places(places, mdfile[0], "main_text", main_text)
 
-
 # 4. POPULATE PLATE AND GRID FROM SHAPEFILE
 
 # TODO: Iterate over shapefile and populate plate and grid, matching on place.id
@@ -115,7 +148,8 @@ for mdfile in mdfiles:
 # places = update_places(places, <placeid>, "grid", <grid string>)
 
 #place_csv = r"C:\_data\book\a Welikia Atlas\3 - gazetteer\plate_grid_ids\placename_grid_v7_07052022.csv"
-place_csv = r"C:\_data\book\a Welikia Atlas\3 - gazetteer\plate_grid_ids\placename_grid_v7_08142022.csv"
+#place_csv = r"C:\_data\book\a Welikia Atlas\3 - gazetteer\plate_grid_ids\placename_grid_v7_08142022.csv"
+place_csv = r"C:\Users\lroyte\Documents\Bucket_Connect_Welikia\book\a Welikia Atlas\3 - gazetteer\placename_v7.1_grid_08142022.csv"
 
 with open (place_csv) as csv_file:
     csv_reader  = csv.reader(csv_file, delimiter = ',')
@@ -171,3 +205,4 @@ Plate {place.plate} ({place.grid})
         f.write(entry)
         
 print ("That's all he wrote, folks!")
+print(type(place.references_output))
