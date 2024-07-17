@@ -22,10 +22,10 @@ import re
 
 # 1. SETUP
 
-VERSION = 3 # markdown file draft
+VERSION = 2 # markdown file draft
 ID_LENAPE = 3
 # ("1"=>"extant", "2"=>"disappeared", "3"=>"created", "4"=>"post-1609 natural")
-STATUS_LABELS = {1: "", 2: "†", 3: "‡", 4: "≈"}
+STATUS_LABELS = {1: "", 2: "†", 3: "‡", 4: "≈", 5: "⤴"}
 STUDY_AREAS = [
     ("sa_bronx", "Bronx"),
     ("sa_brooklyn", "Brooklyn"),
@@ -150,7 +150,7 @@ for mdfile in mdfiles:
 
 #place_csv = r"C:\_data\book\a Welikia Atlas\3 - gazetteer\plate_grid_ids\placename_grid_v7_07052022.csv"
 #place_csv = r"C:\_data\book\a Welikia Atlas\3 - gazetteer\plate_grid_ids\placename_grid_v7_08142022.csv"
-place_csv = r"C:\Users\lroyte\Documents\Bucket_Connect_Welikia\book\a Welikia Atlas\3 - gazetteer\plate_grid\placename_v7.3_grid_05242024.csv"
+place_csv = r"C:\Users\lroyte\Documents\Bucket_Connect_Welikia\book\a Welikia Atlas\3 - gazetteer\plate_grid\Placenames_v7_grid_06272024.csv"
 
 with open (place_csv) as csv_file:
     csv_reader  = csv.reader(csv_file, delimiter = ',')
