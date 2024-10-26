@@ -26,8 +26,8 @@ VERSION = 3 # markdown file draft
 ID_LENAPE = 3
 # ("1"=>"extant", "2"=>"disappeared", "3"=>"created", "4"=>"post-1609 natural")
 STATUS_LABELS = {1: "", 2: "†", 3: "‡", 4: "≈", 5: "^"}
-INVENTED_STATUS = {False: "", True:"*"}
-# TODO: if canonical name is also invented add symbol
+# if canonical name is also invented add * symbol
+INVENTED_STATUS = {False: "", True:r"\*"}
 STUDY_AREAS = [
     ("sa_bronx", "Bronx"),
     ("sa_brooklyn", "Brooklyn"),
@@ -189,23 +189,28 @@ places = [p for p in places if p.main_text != ""]   # removes all places without
 #  - Can't right-align plate/grid in markdown
 #  - Move to pypandoc and write to docx and do as much formatting as possible?
 #    Or more useful to output text simply here, for further automated processing externally?
+lines = 77
 with outputfile.open("w", encoding='utf-8') as f:
     for place in places:
+        placename=place.output_name
+        invented_sym=place.name_invented
+        status_used=place.status
+        plate_len=str(place.plate)
+        grid_len=place.grid
+        words='Plate ()'
+        used_space= len(placename)+len(invented_sym)+len(status_used)+len(plate_len)+len(grid_len)+len(grid_len)+len(words)
+        whitespace = lines-used_space
+        if place.name_indigenous is True:
+            whitespace=whitespace-6
+        # Construct the entry for each place
         entry = f"""
-**{place.output_name}{place.status}{place.name_invented}** ({", ".join(place.study_areas)})
-
-
-Plate {place.plate} ({place.grid})
-
-<*start_text*>
+**{place.output_name}{place.name_invented}{place.status}**{'^' *whitespace}{f'Plate {place.plate} ({place.grid})'}
 
 {place.main_text}
 
-<*end_text*> id={place.id}
-
 {place.references_output}
-"""
 
+"""
         f.write(entry)
         
 print ("That's all he wrote, folks!")

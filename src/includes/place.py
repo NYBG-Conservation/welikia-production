@@ -96,19 +96,13 @@ class Place:
         # Comment these two lines if special invented treatment not desired
         # if self.name_invented is True:
         #     cleaned_name = f"{self.name}"
-        # if self.name_indigenous is True:
-        #     cleaned_name = f'"{cleaned_name}"'
+        if self.name_indigenous is True:
+            cleaned_name = f'**_{cleaned_name}_**'
         return cleaned_name.strip()
 
     @property
     def references_output(self):
-        if len(self.maps + self.texts + self.artwork) <= 5:
-            return format_references("Reference", self.maps + self.texts + self.artwork)
-        else:
-            maps = format_references("Map", self.maps)
-            texts = format_references("Text", self.texts)
-            artwork = format_references("Artwork", self.artwork)
-        return f"{maps}{texts}{artwork}"
+        return format_references("Source", self.maps + self.texts + self.artwork)
 
     sql = """
 SELECT placename.id_placename,
